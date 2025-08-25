@@ -1,0 +1,568 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Feed - Red Social Inmobiliaria</title>
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+    <link href="/css/styles.css" rel="stylesheet">
+</head>
+<body class="bg-light">
+    <!-- Navigation -->
+    <nav class="navbar navbar-expand-lg navbar-dark bg-primary sticky-top">
+        <div class="container">
+            <a class="navbar-brand fw-bold" href="/feed">🏠 Real Estate Social</a>
+            
+            <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbarNav">
+                <span class="navbar-toggler-icon"></span>
+            </button>
+            
+            <div class="collapse navbar-collapse" id="navbarNav">
+                <ul class="navbar-nav me-auto">
+                    <li class="nav-item">
+                        <a class="nav-link active" href="/feed">Inicio</a>
+                    </li>
+                    <li class="nav-item" id="nav-post" style="display: none;">
+                        <a class="nav-link" href="/post">Publicar</a>
+                    </li>
+                    <li class="nav-item" id="nav-admin" style="display: none;">
+                        <a class="nav-link" href="/admin">Administración</a>
+                    </li>
+                </ul>
+                
+                <ul class="navbar-nav">
+                    <li class="nav-item dropdown">
+                        <a class="nav-link dropdown-toggle" href="#" id="navbarDropdown" role="button" data-bs-toggle="dropdown">
+                            <span id="username-display">Usuario</span>
+                        </a>
+                        <ul class="dropdown-menu">
+                            <li><a class="dropdown-item" href="#" onclick="showProfile()">Mi Perfil</a></li>
+                            <li><a class="dropdown-item" href="#" onclick="showMyPosts()" id="my-posts-link" style="display: none;">Mis Publicaciones</a></li>
+                            <li><a class="dropdown-item" href="#" onclick="showMessages()">Mensajes <span id="unread-badge" class="badge bg-danger ms-1" style="display: none;">0</span></a></li>
+                            <li><hr class="dropdown-divider"></li>
+                            <li><a class="dropdown-item" href="#" onclick="logout()">Cerrar Sesión</a></li>
+                        </ul>
+                    </li>
+                </ul>
+            </div>
+        </div>
+    </nav>
+
+    <div class="container mt-4">
+        <div class="row">
+            <!-- Filters Sidebar -->
+            <div class="col-lg-3 mb-4">
+                <div class="card">
+                    <div class="card-header">
+                        <h5 class="mb-0">Filtros</h5>
+                    </div>
+                    <div class="card-body">
+                        <form id="filtersForm">
+                            <div class="mb-3">
+                                <label for="city" class="form-label">Ciudad</label>
+                                <input type="text" class="form-control" id="city" name="city" placeholder="Buscar por ciudad">
+                            </div>
+                            
+                            <div class="mb-3">
+                                <label for="property_type" class="form-label">Tipo de Propiedad</label>
+                                <select class="form-select" id="property_type" name="property_type">
+                                    <option value="">Todos</option>
+                                    <option value="house">Casa</option>
+                                    <option value="apartment">Apartamento</option>
+                                    <option value="condo">Condominio</option>
+                                    <option value="land">Terreno</option>
+                                    <option value="commercial">Comercial</option>
+                                </select>
+                            </div>
+                            
+                            <div class="mb-3">
+                                <label for="min_price" class="form-label">Precio Mínimo</label>
+                                <input type="number" class="form-control" id="min_price" name="min_price" placeholder="0">
+                            </div>
+                            
+                            <div class="mb-3">
+                                <label for="max_price" class="form-label">Precio Máximo</label>
+                                <input type="number" class="form-control" id="max_price" name="max_price" placeholder="Sin límite">
+                            </div>
+                            
+                            <div class="mb-3">
+                                <label for="bedrooms" class="form-label">Habitaciones Mínimas</label>
+                                <select class="form-select" id="bedrooms" name="bedrooms">
+                                    <option value="">Cualquiera</option>
+                                    <option value="1">1+</option>
+                                    <option value="2">2+</option>
+                                    <option value="3">3+</option>
+                                    <option value="4">4+</option>
+                                    <option value="5">5+</option>
+                                </select>
+                            </div>
+                            
+                            <button type="submit" class="btn btn-primary w-100">Aplicar Filtros</button>
+                            <button type="button" class="btn btn-outline-secondary w-100 mt-2" onclick="clearFilters()">Limpiar</button>
+                        </form>
+                    </div>
+                </div>
+            </div>
+            
+            <!-- Posts Feed -->
+            <div class="col-lg-9">
+                <div id="posts-container">
+                    <div class="text-center py-5">
+                        <div class="spinner-border text-primary" role="status">
+                            <span class="visually-hidden">Cargando...</span>
+                        </div>
+                        <p class="mt-2">Cargando propiedades...</p>
+                    </div>
+                </div>
+                
+                <!-- Pagination -->
+                <nav id="pagination-container" style="display: none;">
+                    <ul class="pagination justify-content-center" id="pagination">
+                    </ul>
+                </nav>
+            </div>
+        </div>
+    </div>
+
+    <!-- Post Detail Modal -->
+    <div class="modal fade" id="postModal" tabindex="-1">
+        <div class="modal-dialog modal-lg">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <h5 class="modal-title" id="postModalTitle">Detalle de Propiedad</h5>
+                    <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
+                </div>
+                <div class="modal-body" id="postModalBody">
+                    <!-- Content will be loaded here -->
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Contact Modal -->
+    <div class="modal fade" id="contactModal" tabindex="-1">
+        <div class="modal-dialog">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <h5 class="modal-title">Contactar Vendedor</h5>
+                    <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
+                </div>
+                <div class="modal-body">
+                    <form id="contactForm">
+                        <input type="hidden" id="contact_receiver_id">
+                        <input type="hidden" id="contact_post_id">
+                        
+                        <div class="mb-3">
+                            <label for="contact_subject" class="form-label">Asunto</label>
+                            <input type="text" class="form-control" id="contact_subject" name="subject" placeholder="Interés en la propiedad">
+                        </div>
+                        
+                        <div class="mb-3">
+                            <label for="contact_message" class="form-label">Mensaje</label>
+                            <textarea class="form-control" id="contact_message" name="message" rows="4" placeholder="Escribe tu mensaje aquí..." required></textarea>
+                        </div>
+                        
+                        <button type="submit" class="btn btn-primary">Enviar Mensaje</button>
+                    </form>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
+    <script src="/js/app.js"></script>
+    <script>
+        let currentUser = null;
+        let currentPage = 1;
+        let currentFilters = {};
+
+        // Initialize page
+        document.addEventListener('DOMContentLoaded', function() {
+            checkAuth();
+            loadPosts();
+            loadUnreadCount();
+            
+            // Set up filters form
+            document.getElementById('filtersForm').addEventListener('submit', function(e) {
+                e.preventDefault();
+                applyFilters();
+            });
+        });
+
+        async function checkAuth() {
+            try {
+                const response = await fetch('/api/auth.php?action=me');
+                const result = await response.json();
+                
+                if (result.success) {
+                    currentUser = result.data.user;
+                    updateNavigation();
+                } else {
+                    window.location.href = '/login';
+                }
+            } catch (error) {
+                window.location.href = '/login';
+            }
+        }
+
+        function updateNavigation() {
+            document.getElementById('username-display').textContent = currentUser.username;
+            
+            // Show/hide navigation items based on role
+            if (currentUser.role === 'seller') {
+                document.getElementById('nav-post').style.display = 'block';
+                document.getElementById('my-posts-link').style.display = 'block';
+            }
+            
+            if (currentUser.role === 'superuser' || currentUser.role === 'admin') {
+                document.getElementById('nav-admin').style.display = 'block';
+            }
+        }
+
+        async function loadPosts(page = 1) {
+            try {
+                const params = new URLSearchParams({
+                    page: page,
+                    limit: 10,
+                    ...currentFilters
+                });
+                
+                const response = await fetch(`/api/posts.php?${params}`);
+                const result = await response.json();
+                
+                if (result.success) {
+                    displayPosts(result.data.posts);
+                    displayPagination(result.data.pagination);
+                } else {
+                    showError('Error al cargar las propiedades');
+                }
+            } catch (error) {
+                showError('Error de conexión');
+            }
+        }
+
+        function displayPosts(posts) {
+            const container = document.getElementById('posts-container');
+            
+            if (posts.length === 0) {
+                container.innerHTML = `
+                    <div class="text-center py-5">
+                        <h4>No se encontraron propiedades</h4>
+                        <p class="text-muted">Intenta ajustar los filtros de búsqueda</p>
+                    </div>
+                `;
+                return;
+            }
+            
+            container.innerHTML = posts.map(post => `
+                <div class="card mb-4">
+                    <div class="row g-0">
+                        <div class="col-md-4">
+                            ${post.primary_image ? 
+                                `<img src="/uploads/${post.primary_image}" class="img-fluid rounded-start h-100 object-fit-cover" alt="${post.title}">` :
+                                `<div class="bg-light d-flex align-items-center justify-content-center h-100 rounded-start">
+                                    <span class="text-muted">Sin imagen</span>
+                                </div>`
+                            }
+                        </div>
+                        <div class="col-md-8">
+                            <div class="card-body">
+                                <div class="d-flex justify-content-between align-items-start mb-2">
+                                    <h5 class="card-title">${post.title}</h5>
+                                    <span class="badge bg-primary">${formatPropertyType(post.property_type)}</span>
+                                </div>
+                                
+                                <p class="card-text text-muted">${truncateText(post.description, 150)}</p>
+                                
+                                <div class="row mb-3">
+                                    <div class="col-sm-6">
+                                        <strong class="text-success fs-4">$${formatPrice(post.price)}</strong>
+                                    </div>
+                                    <div class="col-sm-6 text-sm-end">
+                                        <small class="text-muted">
+                                            ${post.bedrooms ? post.bedrooms + ' hab.' : ''} 
+                                            ${post.bathrooms ? post.bathrooms + ' baños' : ''}
+                                            ${post.area_sqm ? post.area_sqm + ' m²' : ''}
+                                        </small>
+                                    </div>
+                                </div>
+                                
+                                <div class="d-flex justify-content-between align-items-center">
+                                    <small class="text-muted">
+                                        📍 ${post.city || 'Ubicación no especificada'}<br>
+                                        👤 ${post.first_name || post.username}
+                                    </small>
+                                    <div>
+                                        <button class="btn btn-outline-primary btn-sm me-2" onclick="showPostDetail(${post.id})">
+                                            Ver Detalles
+                                        </button>
+                                        ${currentUser.role === 'buyer' ? 
+                                            `<button class="btn btn-primary btn-sm" onclick="showContactModal(${post.user_id}, ${post.id}, '${post.title}')">
+                                                Contactar
+                                            </button>` : ''
+                                        }
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            `).join('');
+        }
+
+        function displayPagination(pagination) {
+            const container = document.getElementById('pagination-container');
+            const paginationList = document.getElementById('pagination');
+            
+            if (pagination.pages <= 1) {
+                container.style.display = 'none';
+                return;
+            }
+            
+            container.style.display = 'block';
+            
+            let paginationHTML = '';
+            
+            // Previous button
+            if (pagination.page > 1) {
+                paginationHTML += `<li class="page-item"><a class="page-link" href="#" onclick="loadPosts(${pagination.page - 1})">Anterior</a></li>`;
+            }
+            
+            // Page numbers
+            for (let i = Math.max(1, pagination.page - 2); i <= Math.min(pagination.pages, pagination.page + 2); i++) {
+                paginationHTML += `<li class="page-item ${i === pagination.page ? 'active' : ''}">
+                    <a class="page-link" href="#" onclick="loadPosts(${i})">${i}</a>
+                </li>`;
+            }
+            
+            // Next button
+            if (pagination.page < pagination.pages) {
+                paginationHTML += `<li class="page-item"><a class="page-link" href="#" onclick="loadPosts(${pagination.page + 1})">Siguiente</a></li>`;
+            }
+            
+            paginationList.innerHTML = paginationHTML;
+        }
+
+        async function showPostDetail(postId) {
+            try {
+                const response = await fetch(`/api/posts.php?action=detail&id=${postId}`);
+                const result = await response.json();
+                
+                if (result.success) {
+                    const post = result.data.post;
+                    document.getElementById('postModalTitle').textContent = post.title;
+                    document.getElementById('postModalBody').innerHTML = `
+                        <div class="row">
+                            <div class="col-md-6">
+                                ${post.images && post.images.length > 0 ? 
+                                    `<div id="postCarousel" class="carousel slide" data-bs-ride="carousel">
+                                        <div class="carousel-inner">
+                                            ${post.images.map((img, index) => `
+                                                <div class="carousel-item ${index === 0 ? 'active' : ''}">
+                                                    <img src="/uploads/${img.filename}" class="d-block w-100" alt="${img.original_name}">
+                                                </div>
+                                            `).join('')}
+                                        </div>
+                                        ${post.images.length > 1 ? `
+                                            <button class="carousel-control-prev" type="button" data-bs-target="#postCarousel" data-bs-slide="prev">
+                                                <span class="carousel-control-prev-icon"></span>
+                                            </button>
+                                            <button class="carousel-control-next" type="button" data-bs-target="#postCarousel" data-bs-slide="next">
+                                                <span class="carousel-control-next-icon"></span>
+                                            </button>
+                                        ` : ''}
+                                    </div>` :
+                                    `<div class="bg-light p-5 text-center rounded">
+                                        <span class="text-muted">Sin imágenes disponibles</span>
+                                    </div>`
+                                }
+                            </div>
+                            <div class="col-md-6">
+                                <h4 class="text-success">$${formatPrice(post.price)}</h4>
+                                <p class="mb-3">${post.description}</p>
+                                
+                                <div class="row mb-3">
+                                    <div class="col-6">
+                                        <strong>Tipo:</strong><br>
+                                        ${formatPropertyType(post.property_type)}
+                                    </div>
+                                    <div class="col-6">
+                                        <strong>Habitaciones:</strong><br>
+                                        ${post.bedrooms || 'No especificado'}
+                                    </div>
+                                </div>
+                                
+                                <div class="row mb-3">
+                                    <div class="col-6">
+                                        <strong>Baños:</strong><br>
+                                        ${post.bathrooms || 'No especificado'}
+                                    </div>
+                                    <div class="col-6">
+                                        <strong>Área:</strong><br>
+                                        ${post.area_sqm ? post.area_sqm + ' m²' : 'No especificado'}
+                                    </div>
+                                </div>
+                                
+                                <div class="mb-3">
+                                    <strong>Ubicación:</strong><br>
+                                    ${post.address || ''} ${post.city || ''} ${post.state || ''}
+                                </div>
+                                
+                                <div class="mb-3">
+                                    <strong>Vendedor:</strong><br>
+                                    ${post.first_name || post.username}
+                                    ${post.phone ? `<br>📞 ${post.phone}` : ''}
+                                </div>
+                                
+                                ${currentUser.role === 'buyer' ? 
+                                    `<button class="btn btn-primary w-100" onclick="showContactModal(${post.user_id}, ${post.id}, '${post.title}')">
+                                        Contactar Vendedor
+                                    </button>` : ''
+                                }
+                            </div>
+                        </div>
+                    `;
+                    
+                    new bootstrap.Modal(document.getElementById('postModal')).show();
+                } else {
+                    showError('Error al cargar los detalles');
+                }
+            } catch (error) {
+                showError('Error de conexión');
+            }
+        }
+
+        function showContactModal(receiverId, postId, postTitle) {
+            document.getElementById('contact_receiver_id').value = receiverId;
+            document.getElementById('contact_post_id').value = postId;
+            document.getElementById('contact_subject').value = `Interés en: ${postTitle}`;
+            
+            new bootstrap.Modal(document.getElementById('contactModal')).show();
+        }
+
+        // Contact form submission
+        document.getElementById('contactForm').addEventListener('submit', async function(e) {
+            e.preventDefault();
+            
+            const formData = new FormData(this);
+            const data = {
+                receiver_id: document.getElementById('contact_receiver_id').value,
+                post_id: document.getElementById('contact_post_id').value,
+                subject: formData.get('subject'),
+                message: formData.get('message')
+            };
+            
+            try {
+                const response = await fetch('/api/messages.php', {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json'
+                    },
+                    body: JSON.stringify(data)
+                });
+                
+                const result = await response.json();
+                
+                if (result.success) {
+                    bootstrap.Modal.getInstance(document.getElementById('contactModal')).hide();
+                    showSuccess('Mensaje enviado correctamente');
+                    this.reset();
+                } else {
+                    showError(result.message);
+                }
+            } catch (error) {
+                showError('Error al enviar el mensaje');
+            }
+        });
+
+        function applyFilters() {
+            const formData = new FormData(document.getElementById('filtersForm'));
+            currentFilters = {};
+            
+            for (let [key, value] of formData.entries()) {
+                if (value.trim()) {
+                    currentFilters[key] = value.trim();
+                }
+            }
+            
+            currentPage = 1;
+            loadPosts(1);
+        }
+
+        function clearFilters() {
+            document.getElementById('filtersForm').reset();
+            currentFilters = {};
+            currentPage = 1;
+            loadPosts(1);
+        }
+
+        async function loadUnreadCount() {
+            try {
+                const response = await fetch('/api/messages.php?action=unread');
+                const result = await response.json();
+                
+                if (result.success && result.data.unread_count > 0) {
+                    const badge = document.getElementById('unread-badge');
+                    badge.textContent = result.data.unread_count;
+                    badge.style.display = 'inline';
+                }
+            } catch (error) {
+                // Ignore errors for unread count
+            }
+        }
+
+        // Utility functions
+        function formatPrice(price) {
+            return new Intl.NumberFormat('es-ES').format(price);
+        }
+
+        function formatPropertyType(type) {
+            const types = {
+                'house': 'Casa',
+                'apartment': 'Apartamento',
+                'condo': 'Condominio',
+                'land': 'Terreno',
+                'commercial': 'Comercial'
+            };
+            return types[type] || type;
+        }
+
+        function truncateText(text, length) {
+            return text.length > length ? text.substring(0, length) + '...' : text;
+        }
+
+        function showError(message) {
+            // You can implement a toast notification here
+            alert('Error: ' + message);
+        }
+
+        function showSuccess(message) {
+            // You can implement a toast notification here
+            alert('Éxito: ' + message);
+        }
+
+        async function logout() {
+            try {
+                await fetch('/api/auth.php?action=logout', { method: 'POST' });
+                window.location.href = '/login';
+            } catch (error) {
+                window.location.href = '/login';
+            }
+        }
+
+        // Placeholder functions for navigation
+        function showProfile() {
+            alert('Función de perfil en desarrollo');
+        }
+
+        function showMyPosts() {
+            alert('Función de mis publicaciones en desarrollo');
+        }
+
+        function showMessages() {
+            alert('Función de mensajes en desarrollo');
+        }
+    </script>
+</body>
+</html>
