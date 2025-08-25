@@ -1,0 +1,184 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Registro - Red Social Inmobiliaria</title>
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+    <link href="/css/styles.css" rel="stylesheet">
+</head>
+<body class="bg-light">
+    <div class="container-fluid vh-100">
+        <div class="row h-100">
+            <!-- Left side - Registration Form -->
+            <div class="col-md-8 d-flex align-items-center justify-content-center">
+                <div class="card shadow-lg border-0" style="width: 100%; max-width: 600px;">
+                    <div class="card-body p-5">
+                        <div class="text-center mb-4">
+                            <h2 class="fw-bold text-dark">Crear Cuenta</h2>
+                            <p class="text-muted">Únete a nuestra red social inmobiliaria</p>
+                        </div>
+                        
+                        <div id="alert-container"></div>
+                        
+                        <form id="registerForm">
+                            <div class="row">
+                                <div class="col-md-6 mb-3">
+                                    <label for="first_name" class="form-label">Nombre</label>
+                                    <input type="text" class="form-control" id="first_name" name="first_name">
+                                </div>
+                                <div class="col-md-6 mb-3">
+                                    <label for="last_name" class="form-label">Apellido</label>
+                                    <input type="text" class="form-control" id="last_name" name="last_name">
+                                </div>
+                            </div>
+                            
+                            <div class="row">
+                                <div class="col-md-6 mb-3">
+                                    <label for="username" class="form-label">Usuario *</label>
+                                    <input type="text" class="form-control" id="username" name="username" required>
+                                </div>
+                                <div class="col-md-6 mb-3">
+                                    <label for="email" class="form-label">Email *</label>
+                                    <input type="email" class="form-control" id="email" name="email" required>
+                                </div>
+                            </div>
+                            
+                            <div class="row">
+                                <div class="col-md-6 mb-3">
+                                    <label for="password" class="form-label">Contraseña *</label>
+                                    <input type="password" class="form-control" id="password" name="password" required minlength="6">
+                                    <div class="form-text">Mínimo 6 caracteres</div>
+                                </div>
+                                <div class="col-md-6 mb-3">
+                                    <label for="phone" class="form-label">Teléfono</label>
+                                    <input type="tel" class="form-control" id="phone" name="phone">
+                                </div>
+                            </div>
+                            
+                            <div class="mb-4">
+                                <label for="role" class="form-label">Tipo de Usuario *</label>
+                                <select class="form-select" id="role" name="role" required>
+                                    <option value="">Selecciona tu rol</option>
+                                    <option value="buyer">Comprador - Busco propiedades</option>
+                                    <option value="seller">Vendedor - Publico propiedades</option>
+                                </select>
+                                <div class="form-text">Los vendedores pueden publicar propiedades, los compradores pueden buscar y contactar.</div>
+                            </div>
+                            
+                            <div class="mb-4">
+                                <div class="form-check">
+                                    <input class="form-check-input" type="checkbox" id="terms" required>
+                                    <label class="form-check-label" for="terms">
+                                        Acepto los <a href="#" class="text-primary">términos y condiciones</a>
+                                    </label>
+                                </div>
+                            </div>
+                            
+                            <button type="submit" class="btn btn-primary btn-lg w-100 mb-3" id="registerBtn">
+                                <span class="spinner-border spinner-border-sm d-none" role="status"></span>
+                                Crear Cuenta
+                            </button>
+                        </form>
+                        
+                        <div class="text-center">
+                            <p class="mb-0">¿Ya tienes cuenta? <a href="/login" class="text-primary text-decoration-none fw-medium">Inicia sesión aquí</a></p>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            
+            <!-- Right side - Info -->
+            <div class="col-md-4 d-none d-md-block position-relative">
+                <div class="h-100 bg-gradient-primary d-flex align-items-center justify-content-center">
+                    <div class="text-center text-white p-4">
+                        <h3 class="fw-bold mb-4">¿Por qué unirte?</h3>
+                        <div class="mb-4">
+                            <div class="bg-white bg-opacity-10 rounded p-3 mb-3">
+                                <h5 class="fw-semibold">Para Vendedores</h5>
+                                <p class="small mb-0">Publica tus propiedades, sube fotos, gestiona contactos</p>
+                            </div>
+                            <div class="bg-white bg-opacity-10 rounded p-3 mb-3">
+                                <h5 class="fw-semibold">Para Compradores</h5>
+                                <p class="small mb-0">Explora propiedades, contacta vendedores directamente</p>
+                            </div>
+                            <div class="bg-white bg-opacity-10 rounded p-3">
+                                <h5 class="fw-semibold">Proceso de Aprobación</h5>
+                                <p class="small mb-0">Tu cuenta será revisada y aprobada por nuestro equipo</p>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
+    <script src="/js/app.js"></script>
+    <script>
+        document.getElementById('registerForm').addEventListener('submit', async function(e) {
+            e.preventDefault();
+            
+            const btn = document.getElementById('registerBtn');
+            const spinner = btn.querySelector('.spinner-border');
+            const alertContainer = document.getElementById('alert-container');
+            
+            // Show loading state
+            btn.disabled = true;
+            spinner.classList.remove('d-none');
+            alertContainer.innerHTML = '';
+            
+            const formData = new FormData(this);
+            const data = {
+                username: formData.get('username'),
+                email: formData.get('email'),
+                password: formData.get('password'),
+                role: formData.get('role'),
+                first_name: formData.get('first_name'),
+                last_name: formData.get('last_name'),
+                phone: formData.get('phone')
+            };
+            
+            try {
+                const response = await fetch('/api/auth.php?action=register', {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json'
+                    },
+                    body: JSON.stringify(data)
+                });
+                
+                const result = await response.json();
+                
+                if (result.success) {
+                    showAlert('success', 'Registro exitoso. Tu cuenta está pendiente de aprobación. Te notificaremos cuando sea aprobada.');
+                    this.reset();
+                } else {
+                    if (result.errors) {
+                        let errorMessages = Object.values(result.errors).join('<br>');
+                        showAlert('danger', errorMessages);
+                    } else {
+                        showAlert('danger', result.message);
+                    }
+                }
+            } catch (error) {
+                showAlert('danger', 'Error de conexión. Intenta nuevamente.');
+            } finally {
+                btn.disabled = false;
+                spinner.classList.add('d-none');
+            }
+        });
+        
+        function showAlert(type, message) {
+            const alertContainer = document.getElementById('alert-container');
+            alertContainer.innerHTML = `
+                <div class="alert alert-${type} alert-dismissible fade show" role="alert">
+                    ${message}
+                    <button type="button" class="btn-close" data-bs-dismiss="alert"></button>
+                </div>
+            `;
+        }
+    </script>
+</body>
+</html>
