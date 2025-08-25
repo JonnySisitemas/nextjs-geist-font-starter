@@ -1,0 +1,117 @@
+# Real Estate Social Network - Apache Configuration
+
+# Enable URL Rewriting
+RewriteEngine On
+
+# Security Headers
+Header always set X-Content-Type-Options nosniff
+Header always set X-Frame-Options DENY
+Header always set X-XSS-Protection "1; mode=block"
+Header always set Referrer-Policy "strict-origin-when-cross-origin"
+
+# CORS Headers for API
+<FilesMatch "\.(php)$">
+    Header set Access-Control-Allow-Origin "*"
+    Header set Access-Control-Allow-Methods "GET, POST, PUT, DELETE, OPTIONS"
+    Header set Access-Control-Allow-Headers "Content-Type, Authorization"
+</FilesMatch>
+
+# Handle preflight OPTIONS requests
+RewriteCond %{REQUEST_METHOD} OPTIONS
+RewriteRule ^(.*)$ $1 [R=200,L]
+
+# API Routes - Direct to API files
+RewriteRule ^api/(.*)$ api/$1 [L]
+
+# Static files - serve directly
+RewriteCond %{REQUEST_FILENAME} -f
+RewriteRule ^(css|js|images|uploads)/(.*)$ $1/$2 [L]
+
+# Image uploads - serve from uploads directory
+RewriteRule ^uploads/(.*)$ ../uploads/$1 [L]
+
+# Main application routes
+RewriteCond %{REQUEST_FILENAME} !-f
+RewriteCond %{REQUEST_FILENAME} !-d
+
+# Route specific pages
+RewriteRule ^login/?$ index.php [L]
+RewriteRule ^register/?$ index.php [L]
+RewriteRule ^feed/?$ index.php [L]
+RewriteRule ^post/?$ index.php [L]
+RewriteRule ^admin/?$ index.php [L]
+RewriteRule ^pending/?$ views/pending.html [L]
+
+# Default route to index.php
+RewriteRule ^(.*)$ index.php [L]
+
+# Deny access to sensitive files
+<Files "*.php~">
+    Order allow,deny
+    Deny from all
+</Files>
+
+<Files "*.inc">
+    Order allow,deny
+    Deny from all
+</Files>
+
+<Files "*.sql">
+    Order allow,deny
+    Deny from all
+</Files>
+
+<Files ".htaccess">
+    Order allow,deny
+    Deny from all
+</Files>
+
+# Deny access to core directory from web
+RewriteRule ^core/ - [F,L]
+RewriteRule ^config/ - [F,L]
+RewriteRule ^sql/ - [F,L]
+
+# Cache static files
+<IfModule mod_expires.c>
+    ExpiresActive On
+    ExpiresByType text/css "access plus 1 month"
+    ExpiresByType application/javascript "access plus 1 month"
+    ExpiresByType image/png "access plus 1 month"
+    ExpiresByType image/jpg "access plus 1 month"
+    ExpiresByType image/jpeg "access plus 1 month"
+    ExpiresByType image/gif "access plus 1 month"
+    ExpiresByType image/svg+xml "access plus 1 month"
+</IfModule>
+
+# Compress files
+<IfModule mod_deflate.c>
+    AddOutputFilterByType DEFLATE text/plain
+    AddOutputFilterByType DEFLATE text/html
+    AddOutputFilterByType DEFLATE text/xml
+    AddOutputFilterByType DEFLATE text/css
+    AddOutputFilterByType DEFLATE application/xml
+    AddOutputFilterByType DEFLATE application/xhtml+xml
+    AddOutputFilterByType DEFLATE application/rss+xml
+    AddOutputFilterByType DEFLATE application/javascript
+    AddOutputFilterByType DEFLATE application/x-javascript
+</IfModule>
+
+# Prevent access to backup files
+<FilesMatch "\.(bak|backup|old|orig|save|swp|tmp)$">
+    Order allow,deny
+    Deny from all
+</FilesMatch>
+
+# Custom error pages (optional)
+# ErrorDocument 404 /404.html
+# ErrorDocument 500 /500.html
+
+# PHP Configuration (if allowed)
+<IfModule mod_php.c>
+    php_value upload_max_filesize 10M
+    php_value post_max_size 10M
+    php_value max_execution_time 30
+    php_value max_input_time 30
+    php_flag display_errors Off
+    php_flag log_errors On
+</IfModule>
