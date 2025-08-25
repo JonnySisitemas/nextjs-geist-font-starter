@@ -1,0 +1,641 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Panel de Administración - Red Social Inmobiliaria</title>
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+    <link href="/css/styles.css" rel="stylesheet">
+</head>
+<body class="bg-light">
+    <!-- Navigation -->
+    <nav class="navbar navbar-expand-lg navbar-dark bg-primary">
+        <div class="container-fluid">
+            <a class="navbar-brand fw-bold" href="/feed">🏠 Real Estate Social - Admin</a>
+            
+            <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbarNav">
+                <span class="navbar-toggler-icon"></span>
+            </button>
+            
+            <div class="collapse navbar-collapse" id="navbarNav">
+                <ul class="navbar-nav me-auto">
+                    <li class="nav-item">
+                        <a class="nav-link" href="/feed">Inicio</a>
+                    </li>
+                    <li class="nav-item">
+                        <a class="nav-link active" href="/admin">Administración</a>
+                    </li>
+                </ul>
+                
+                <ul class="navbar-nav">
+                    <li class="nav-item">
+                        <span class="navbar-text me-3" id="admin-info">Admin</span>
+                    </li>
+                    <li class="nav-item">
+                        <a class="nav-link" href="#" onclick="logout()">Cerrar Sesión</a>
+                    </li>
+                </ul>
+            </div>
+        </div>
+    </nav>
+
+    <div class="container-fluid mt-4">
+        <div class="row">
+            <!-- Sidebar -->
+            <div class="col-md-3 col-lg-2">
+                <div class="card">
+                    <div class="card-header">
+                        <h6 class="mb-0">Panel de Control</h6>
+                    </div>
+                    <div class="list-group list-group-flush">
+                        <a href="#" class="list-group-item list-group-item-action active" onclick="showSection('pending-users')">
+                            👥 Usuarios Pendientes <span id="pending-count" class="badge bg-warning ms-auto">0</span>
+                        </a>
+                        <a href="#" class="list-group-item list-group-item-action" onclick="showSection('all-users')">
+                            👤 Todos los Usuarios
+                        </a>
+                        <a href="#" class="list-group-item list-group-item-action" onclick="showSection('posts-management')">
+                            🏠 Gestión de Publicaciones
+                        </a>
+                        <a href="#" class="list-group-item list-group-item-action" onclick="showSection('statistics')">
+                            📊 Estadísticas
+                        </a>
+                    </div>
+                </div>
+            </div>
+            
+            <!-- Main Content -->
+            <div class="col-md-9 col-lg-10">
+                <div id="alert-container"></div>
+                
+                <!-- Pending Users Section -->
+                <div id="pending-users-section" class="admin-section">
+                    <div class="card">
+                        <div class="card-header d-flex justify-content-between align-items-center">
+                            <h5 class="mb-0">👥 Usuarios Pendientes de Aprobación</h5>
+                            <button class="btn btn-outline-primary btn-sm" onclick="loadPendingUsers()">
+                                🔄 Actualizar
+                            </button>
+                        </div>
+                        <div class="card-body">
+                            <div id="pending-users-container">
+                                <div class="text-center py-4">
+                                    <div class="spinner-border text-primary" role="status">
+                                        <span class="visually-hidden">Cargando...</span>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                
+                <!-- All Users Section -->
+                <div id="all-users-section" class="admin-section" style="display: none;">
+                    <div class="card">
+                        <div class="card-header d-flex justify-content-between align-items-center">
+                            <h5 class="mb-0">👤 Gestión de Usuarios</h5>
+                            <button class="btn btn-outline-primary btn-sm" onclick="loadAllUsers()">
+                                🔄 Actualizar
+                            </button>
+                        </div>
+                        <div class="card-body">
+                            <div id="all-users-container">
+                                <div class="text-center py-4">
+                                    <div class="spinner-border text-primary" role="status">
+                                        <span class="visually-hidden">Cargando...</span>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                
+                <!-- Posts Management Section -->
+                <div id="posts-management-section" class="admin-section" style="display: none;">
+                    <div class="card">
+                        <div class="card-header">
+                            <h5 class="mb-0">🏠 Gestión de Publicaciones</h5>
+                        </div>
+                        <div class="card-body">
+                            <div class="row mb-3">
+                                <div class="col-md-6">
+                                    <input type="text" class="form-control" id="post-search" placeholder="Buscar por título...">
+                                </div>
+                                <div class="col-md-3">
+                                    <select class="form-select" id="post-status-filter">
+                                        <option value="">Todos los estados</option>
+                                        <option value="active">Activos</option>
+                                        <option value="sold">Vendidos</option>
+                                        <option value="inactive">Inactivos</option>
+                                    </select>
+                                </div>
+                                <div class="col-md-3">
+                                    <button class="btn btn-primary w-100" onclick="loadPosts()">Buscar</button>
+                                </div>
+                            </div>
+                            <div id="posts-container">
+                                <p class="text-muted">Usa los filtros para buscar publicaciones.</p>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                
+                <!-- Statistics Section -->
+                <div id="statistics-section" class="admin-section" style="display: none;">
+                    <div class="row">
+                        <div class="col-md-3 mb-4">
+                            <div class="card bg-primary text-white">
+                                <div class="card-body">
+                                    <h4 id="total-users">0</h4>
+                                    <p class="mb-0">Total Usuarios</p>
+                                </div>
+                            </div>
+                        </div>
+                        <div class="col-md-3 mb-4">
+                            <div class="card bg-success text-white">
+                                <div class="card-body">
+                                    <h4 id="total-posts">0</h4>
+                                    <p class="mb-0">Total Publicaciones</p>
+                                </div>
+                            </div>
+                        </div>
+                        <div class="col-md-3 mb-4">
+                            <div class="card bg-warning text-white">
+                                <div class="card-body">
+                                    <h4 id="pending-users-stat">0</h4>
+                                    <p class="mb-0">Usuarios Pendientes</p>
+                                </div>
+                            </div>
+                        </div>
+                        <div class="col-md-3 mb-4">
+                            <div class="card bg-info text-white">
+                                <div class="card-body">
+                                    <h4 id="active-posts">0</h4>
+                                    <p class="mb-0">Publicaciones Activas</p>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                    
+                    <div class="card">
+                        <div class="card-header">
+                            <h5 class="mb-0">📊 Estadísticas Detalladas</h5>
+                        </div>
+                        <div class="card-body">
+                            <div class="row">
+                                <div class="col-md-6">
+                                    <h6>Usuarios por Rol</h6>
+                                    <div id="users-by-role"></div>
+                                </div>
+                                <div class="col-md-6">
+                                    <h6>Publicaciones por Tipo</h6>
+                                    <div id="posts-by-type"></div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- User Action Modal -->
+    <div class="modal fade" id="userActionModal" tabindex="-1">
+        <div class="modal-dialog">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <h5 class="modal-title" id="userActionModalTitle">Acción de Usuario</h5>
+                    <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
+                </div>
+                <div class="modal-body" id="userActionModalBody">
+                    <!-- Content will be loaded here -->
+                </div>
+                <div class="modal-footer" id="userActionModalFooter">
+                    <!-- Buttons will be loaded here -->
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
+    <script src="/js/app.js"></script>
+    <script>
+        let currentUser = null;
+        let currentSection = 'pending-users';
+
+        document.addEventListener('DOMContentLoaded', function() {
+            checkAuth();
+            loadPendingUsers();
+        });
+
+        async function checkAuth() {
+            try {
+                const response = await fetch('/api/auth.php?action=me');
+                const result = await response.json();
+                
+                if (result.success) {
+                    currentUser = result.data.user;
+                    
+                    if (!['superuser', 'admin'].includes(currentUser.role)) {
+                        showAlert('danger', 'Acceso denegado. Solo administradores pueden acceder.');
+                        setTimeout(() => {
+                            window.location.href = '/feed';
+                        }, 2000);
+                        return;
+                    }
+                    
+                    document.getElementById('admin-info').textContent = `${currentUser.username} (${currentUser.role})`;
+                } else {
+                    window.location.href = '/login';
+                }
+            } catch (error) {
+                window.location.href = '/login';
+            }
+        }
+
+        function showSection(sectionName) {
+            // Hide all sections
+            document.querySelectorAll('.admin-section').forEach(section => {
+                section.style.display = 'none';
+            });
+            
+            // Remove active class from all sidebar items
+            document.querySelectorAll('.list-group-item').forEach(item => {
+                item.classList.remove('active');
+            });
+            
+            // Show selected section
+            document.getElementById(sectionName + '-section').style.display = 'block';
+            
+            // Add active class to clicked item
+            event.target.classList.add('active');
+            
+            currentSection = sectionName;
+            
+            // Load data for the section
+            switch(sectionName) {
+                case 'pending-users':
+                    loadPendingUsers();
+                    break;
+                case 'all-users':
+                    loadAllUsers();
+                    break;
+                case 'statistics':
+                    loadStatistics();
+                    break;
+            }
+        }
+
+        async function loadPendingUsers() {
+            try {
+                const response = await fetch('/api/users.php?action=pending');
+                const result = await response.json();
+                
+                if (result.success) {
+                    displayPendingUsers(result.data.users);
+                    document.getElementById('pending-count').textContent = result.data.users.length;
+                } else {
+                    showError('Error al cargar usuarios pendientes');
+                }
+            } catch (error) {
+                showError('Error de conexión');
+            }
+        }
+
+        function displayPendingUsers(users) {
+            const container = document.getElementById('pending-users-container');
+            
+            if (users.length === 0) {
+                container.innerHTML = `
+                    <div class="text-center py-4">
+                        <h6>✅ No hay usuarios pendientes</h6>
+                        <p class="text-muted">Todos los usuarios han sido procesados.</p>
+                    </div>
+                `;
+                return;
+            }
+            
+            container.innerHTML = `
+                <div class="table-responsive">
+                    <table class="table table-hover">
+                        <thead>
+                            <tr>
+                                <th>Usuario</th>
+                                <th>Email</th>
+                                <th>Rol</th>
+                                <th>Fecha Registro</th>
+                                <th>Acciones</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            ${users.map(user => `
+                                <tr>
+                                    <td>
+                                        <strong>${user.username}</strong><br>
+                                        <small class="text-muted">${user.first_name || ''} ${user.last_name || ''}</small>
+                                    </td>
+                                    <td>${user.email}</td>
+                                    <td><span class="badge bg-info">${formatRole(user.role)}</span></td>
+                                    <td><small>${formatDate(user.created_at)}</small></td>
+                                    <td>
+                                        <button class="btn btn-success btn-sm me-1" onclick="approveUser(${user.id}, '${user.username}')">
+                                            ✅ Aprobar
+                                        </button>
+                                        <button class="btn btn-danger btn-sm" onclick="rejectUser(${user.id}, '${user.username}')">
+                                            ❌ Rechazar
+                                        </button>
+                                    </td>
+                                </tr>
+                            `).join('')}
+                        </tbody>
+                    </table>
+                </div>
+            `;
+        }
+
+        async function loadAllUsers() {
+            try {
+                const response = await fetch('/api/users.php?action=all');
+                const result = await response.json();
+                
+                if (result.success) {
+                    displayAllUsers(result.data.users);
+                } else {
+                    showError('Error al cargar usuarios');
+                }
+            } catch (error) {
+                showError('Error de conexión');
+            }
+        }
+
+        function displayAllUsers(users) {
+            const container = document.getElementById('all-users-container');
+            
+            container.innerHTML = `
+                <div class="table-responsive">
+                    <table class="table table-hover">
+                        <thead>
+                            <tr>
+                                <th>Usuario</th>
+                                <th>Email</th>
+                                <th>Rol</th>
+                                <th>Estado</th>
+                                <th>Fecha Registro</th>
+                                <th>Acciones</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            ${users.map(user => `
+                                <tr>
+                                    <td>
+                                        <strong>${user.username}</strong><br>
+                                        <small class="text-muted">${user.first_name || ''} ${user.last_name || ''}</small>
+                                    </td>
+                                    <td>${user.email}</td>
+                                    <td><span class="badge bg-info">${formatRole(user.role)}</span></td>
+                                    <td><span class="badge bg-${getStatusColor(user.status)}">${formatStatus(user.status)}</span></td>
+                                    <td><small>${formatDate(user.created_at)}</small></td>
+                                    <td>
+                                        ${user.id !== currentUser.id ? `
+                                            <div class="btn-group btn-group-sm">
+                                                <button class="btn btn-outline-primary dropdown-toggle" data-bs-toggle="dropdown">
+                                                    Acciones
+                                                </button>
+                                                <ul class="dropdown-menu">
+                                                    ${user.status === 'banned' ? 
+                                                        `<li><a class="dropdown-item" href="#" onclick="unbanUser(${user.id}, '${user.username}')">🔓 Desbanear</a></li>` :
+                                                        `<li><a class="dropdown-item" href="#" onclick="banUser(${user.id}, '${user.username}')">🚫 Banear</a></li>`
+                                                    }
+                                                    ${currentUser.role === 'superuser' && user.role !== 'superuser' ? 
+                                                        `<li><a class="dropdown-item" href="#" onclick="showPromoteModal(${user.id}, '${user.username}', '${user.role}')">⬆️ Cambiar Rol</a></li>` : ''
+                                                    }
+                                                </ul>
+                                            </div>
+                                        ` : '<small class="text-muted">Tú</small>'}
+                                    </td>
+                                </tr>
+                            `).join('')}
+                        </tbody>
+                    </table>
+                </div>
+            `;
+        }
+
+        async function approveUser(userId, username) {
+            if (!confirm(`¿Aprobar al usuario "${username}"?`)) return;
+            
+            try {
+                const response = await fetch('/api/users.php?action=approve', {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify({ user_id: userId })
+                });
+                
+                const result = await response.json();
+                
+                if (result.success) {
+                    showSuccess('Usuario aprobado correctamente');
+                    loadPendingUsers();
+                } else {
+                    showError(result.message);
+                }
+            } catch (error) {
+                showError('Error al aprobar usuario');
+            }
+        }
+
+        async function rejectUser(userId, username) {
+            if (!confirm(`¿Rechazar y eliminar al usuario "${username}"? Esta acción no se puede deshacer.`)) return;
+            
+            try {
+                const response = await fetch('/api/users.php?action=reject', {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify({ user_id: userId })
+                });
+                
+                const result = await response.json();
+                
+                if (result.success) {
+                    showSuccess('Usuario rechazado y eliminado');
+                    loadPendingUsers();
+                } else {
+                    showError(result.message);
+                }
+            } catch (error) {
+                showError('Error al rechazar usuario');
+            }
+        }
+
+        async function banUser(userId, username) {
+            if (!confirm(`¿Banear al usuario "${username}"?`)) return;
+            
+            try {
+                const response = await fetch('/api/users.php?action=ban', {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify({ user_id: userId })
+                });
+                
+                const result = await response.json();
+                
+                if (result.success) {
+                    showSuccess('Usuario baneado correctamente');
+                    loadAllUsers();
+                } else {
+                    showError(result.message);
+                }
+            } catch (error) {
+                showError('Error al banear usuario');
+            }
+        }
+
+        async function unbanUser(userId, username) {
+            if (!confirm(`¿Desbanear al usuario "${username}"?`)) return;
+            
+            try {
+                const response = await fetch('/api/users.php?action=unban', {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify({ user_id: userId })
+                });
+                
+                const result = await response.json();
+                
+                if (result.success) {
+                    showSuccess('Usuario desbaneado correctamente');
+                    loadAllUsers();
+                } else {
+                    showError(result.message);
+                }
+            } catch (error) {
+                showError('Error al desbanear usuario');
+            }
+        }
+
+        function showPromoteModal(userId, username, currentRole) {
+            const modal = document.getElementById('userActionModal');
+            document.getElementById('userActionModalTitle').textContent = `Cambiar Rol - ${username}`;
+            
+            document.getElementById('userActionModalBody').innerHTML = `
+                <p>Rol actual: <strong>${formatRole(currentRole)}</strong></p>
+                <div class="mb-3">
+                    <label for="newRole" class="form-label">Nuevo Rol:</label>
+                    <select class="form-select" id="newRole">
+                        <option value="buyer" ${currentRole === 'buyer' ? 'selected' : ''}>Comprador</option>
+                        <option value="seller" ${currentRole === 'seller' ? 'selected' : ''}>Vendedor</option>
+                        <option value="admin" ${currentRole === 'admin' ? 'selected' : ''}>Administrador</option>
+                    </select>
+                </div>
+            `;
+            
+            document.getElementById('userActionModalFooter').innerHTML = `
+                <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Cancelar</button>
+                <button type="button" class="btn btn-primary" onclick="promoteUser(${userId}, '${username}')">Cambiar Rol</button>
+            `;
+            
+            new bootstrap.Modal(modal).show();
+        }
+
+        async function promoteUser(userId, username) {
+            const newRole = document.getElementById('newRole').value;
+            
+            try {
+                const response = await fetch('/api/users.php?action=promote', {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify({ user_id: userId, role: newRole })
+                });
+                
+                const result = await response.json();
+                
+                if (result.success) {
+                    showSuccess('Rol actualizado correctamente');
+                    bootstrap.Modal.getInstance(document.getElementById('userActionModal')).hide();
+                    loadAllUsers();
+                } else {
+                    showError(result.message);
+                }
+            } catch (error) {
+                showError('Error al cambiar rol');
+            }
+        }
+
+        async function loadStatistics() {
+            // This would load various statistics
+            // For now, we'll show placeholder data
+            document.getElementById('total-users').textContent = '0';
+            document.getElementById('total-posts').textContent = '0';
+            document.getElementById('pending-users-stat').textContent = '0';
+            document.getElementById('active-posts').textContent = '0';
+        }
+
+        // Utility functions
+        function formatRole(role) {
+            const roles = {
+                'superuser': 'Superusuario',
+                'admin': 'Administrador',
+                'seller': 'Vendedor',
+                'buyer': 'Comprador'
+            };
+            return roles[role] || role;
+        }
+
+        function formatStatus(status) {
+            const statuses = {
+                'pending': 'Pendiente',
+                'approved': 'Aprobado',
+                'banned': 'Baneado'
+            };
+            return statuses[status] || status;
+        }
+
+        function getStatusColor(status) {
+            const colors = {
+                'pending': 'warning',
+                'approved': 'success',
+                'banned': 'danger'
+            };
+            return colors[status] || 'secondary';
+        }
+
+        function formatDate(dateString) {
+            return new Date(dateString).toLocaleDateString('es-ES', {
+                year: 'numeric',
+                month: 'short',
+                day: 'numeric',
+                hour: '2-digit',
+                minute: '2-digit'
+            });
+        }
+
+        function showAlert(type, message) {
+            const alertContainer = document.getElementById('alert-container');
+            alertContainer.innerHTML = `
+                <div class="alert alert-${type} alert-dismissible fade show" role="alert">
+                    ${message}
+                    <button type="button" class="btn-close" data-bs-dismiss="alert"></button>
+                </div>
+            `;
+        }
+
+        function showError(message) {
+            showAlert('danger', message);
+        }
+
+        function showSuccess(message) {
+            showAlert('success', message);
+        }
+
+        async function logout() {
+            try {
+                await fetch('/api/auth.php?action=logout', { method: 'POST' });
+                window.location.href = '/login';
+            } catch (error) {
+                window.location.href = '/login';
+            }
+        }
+    </script>
+</body>
+</html>
