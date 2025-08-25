@@ -1,0 +1,395 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Publicar Propiedad - Red Social Inmobiliaria</title>
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+    <link href="/css/styles.css" rel="stylesheet">
+</head>
+<body class="bg-light">
+    <!-- Navigation -->
+    <nav class="navbar navbar-expand-lg navbar-dark bg-primary">
+        <div class="container">
+            <a class="navbar-brand fw-bold" href="/feed">🏠 Real Estate Social</a>
+            
+            <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbarNav">
+                <span class="navbar-toggler-icon"></span>
+            </button>
+            
+            <div class="collapse navbar-collapse" id="navbarNav">
+                <ul class="navbar-nav me-auto">
+                    <li class="nav-item">
+                        <a class="nav-link" href="/feed">Inicio</a>
+                    </li>
+                    <li class="nav-item">
+                        <a class="nav-link active" href="/post">Publicar</a>
+                    </li>
+                </ul>
+                
+                <ul class="navbar-nav">
+                    <li class="nav-item">
+                        <a class="nav-link" href="#" onclick="logout()">Cerrar Sesión</a>
+                    </li>
+                </ul>
+            </div>
+        </div>
+    </nav>
+
+    <div class="container mt-4">
+        <div class="row justify-content-center">
+            <div class="col-lg-8">
+                <div class="card shadow">
+                    <div class="card-header bg-primary text-white">
+                        <h4 class="mb-0">📝 Publicar Nueva Propiedad</h4>
+                    </div>
+                    <div class="card-body p-4">
+                        <div id="alert-container"></div>
+                        
+                        <form id="postForm" enctype="multipart/form-data">
+                            <!-- Basic Information -->
+                            <div class="row mb-4">
+                                <div class="col-12">
+                                    <h5 class="text-primary mb-3">Información Básica</h5>
+                                </div>
+                                
+                                <div class="col-md-8 mb-3">
+                                    <label for="title" class="form-label">Título de la Propiedad *</label>
+                                    <input type="text" class="form-control" id="title" name="title" required 
+                                           placeholder="Ej: Casa moderna de 3 habitaciones en zona residencial">
+                                </div>
+                                
+                                <div class="col-md-4 mb-3">
+                                    <label for="property_type" class="form-label">Tipo de Propiedad *</label>
+                                    <select class="form-select" id="property_type" name="property_type" required>
+                                        <option value="">Seleccionar</option>
+                                        <option value="house">Casa</option>
+                                        <option value="apartment">Apartamento</option>
+                                        <option value="condo">Condominio</option>
+                                        <option value="land">Terreno</option>
+                                        <option value="commercial">Comercial</option>
+                                    </select>
+                                </div>
+                                
+                                <div class="col-12 mb-3">
+                                    <label for="description" class="form-label">Descripción *</label>
+                                    <textarea class="form-control" id="description" name="description" rows="4" required
+                                              placeholder="Describe las características principales de la propiedad..."></textarea>
+                                </div>
+                            </div>
+
+                            <!-- Price and Details -->
+                            <div class="row mb-4">
+                                <div class="col-12">
+                                    <h5 class="text-primary mb-3">Precio y Detalles</h5>
+                                </div>
+                                
+                                <div class="col-md-4 mb-3">
+                                    <label for="price" class="form-label">Precio *</label>
+                                    <div class="input-group">
+                                        <span class="input-group-text">$</span>
+                                        <input type="number" class="form-control" id="price" name="price" required 
+                                               placeholder="0" min="0" step="0.01">
+                                    </div>
+                                </div>
+                                
+                                <div class="col-md-4 mb-3">
+                                    <label for="bedrooms" class="form-label">Habitaciones</label>
+                                    <select class="form-select" id="bedrooms" name="bedrooms">
+                                        <option value="">No especificar</option>
+                                        <option value="1">1</option>
+                                        <option value="2">2</option>
+                                        <option value="3">3</option>
+                                        <option value="4">4</option>
+                                        <option value="5">5</option>
+                                        <option value="6">6+</option>
+                                    </select>
+                                </div>
+                                
+                                <div class="col-md-4 mb-3">
+                                    <label for="bathrooms" class="form-label">Baños</label>
+                                    <select class="form-select" id="bathrooms" name="bathrooms">
+                                        <option value="">No especificar</option>
+                                        <option value="1">1</option>
+                                        <option value="2">2</option>
+                                        <option value="3">3</option>
+                                        <option value="4">4</option>
+                                        <option value="5">5+</option>
+                                    </select>
+                                </div>
+                                
+                                <div class="col-md-6 mb-3">
+                                    <label for="area_sqm" class="form-label">Área (m²)</label>
+                                    <input type="number" class="form-control" id="area_sqm" name="area_sqm" 
+                                           placeholder="0" min="0" step="0.01">
+                                </div>
+                            </div>
+
+                            <!-- Location -->
+                            <div class="row mb-4">
+                                <div class="col-12">
+                                    <h5 class="text-primary mb-3">Ubicación</h5>
+                                </div>
+                                
+                                <div class="col-12 mb-3">
+                                    <label for="address" class="form-label">Dirección</label>
+                                    <input type="text" class="form-control" id="address" name="address" 
+                                           placeholder="Calle, número, colonia">
+                                </div>
+                                
+                                <div class="col-md-4 mb-3">
+                                    <label for="city" class="form-label">Ciudad</label>
+                                    <input type="text" class="form-control" id="city" name="city" placeholder="Ciudad">
+                                </div>
+                                
+                                <div class="col-md-4 mb-3">
+                                    <label for="state" class="form-label">Estado/Provincia</label>
+                                    <input type="text" class="form-control" id="state" name="state" placeholder="Estado">
+                                </div>
+                                
+                                <div class="col-md-4 mb-3">
+                                    <label for="country" class="form-label">País</label>
+                                    <input type="text" class="form-control" id="country" name="country" placeholder="País">
+                                </div>
+                                
+                                <div class="col-md-6 mb-3">
+                                    <label for="latitude" class="form-label">Latitud (opcional)</label>
+                                    <input type="number" class="form-control" id="latitude" name="latitude" 
+                                           placeholder="0.000000" step="any">
+                                </div>
+                                
+                                <div class="col-md-6 mb-3">
+                                    <label for="longitude" class="form-label">Longitud (opcional)</label>
+                                    <input type="number" class="form-control" id="longitude" name="longitude" 
+                                           placeholder="0.000000" step="any">
+                                </div>
+                            </div>
+
+                            <!-- Images -->
+                            <div class="row mb-4">
+                                <div class="col-12">
+                                    <h5 class="text-primary mb-3">Imágenes</h5>
+                                    <p class="text-muted small">Sube hasta 10 imágenes de la propiedad. La primera imagen será la principal.</p>
+                                </div>
+                                
+                                <div class="col-12 mb-3">
+                                    <label for="images" class="form-label">Seleccionar Imágenes</label>
+                                    <input type="file" class="form-control" id="images" name="images[]" 
+                                           multiple accept="image/*" onchange="previewImages()">
+                                    <div class="form-text">Formatos permitidos: JPG, PNG, GIF. Máximo 5MB por imagen.</div>
+                                </div>
+                                
+                                <div class="col-12">
+                                    <div id="image-preview" class="row"></div>
+                                </div>
+                            </div>
+
+                            <!-- Submit Buttons -->
+                            <div class="row">
+                                <div class="col-12">
+                                    <hr>
+                                    <div class="d-flex justify-content-between">
+                                        <a href="/feed" class="btn btn-outline-secondary">
+                                            ← Cancelar
+                                        </a>
+                                        <button type="submit" class="btn btn-primary btn-lg" id="submitBtn">
+                                            <span class="spinner-border spinner-border-sm d-none" role="status"></span>
+                                            📤 Publicar Propiedad
+                                        </button>
+                                    </div>
+                                </div>
+                            </div>
+                        </form>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
+    <script src="/js/app.js"></script>
+    <script>
+        let selectedImages = [];
+        let currentUser = null;
+
+        document.addEventListener('DOMContentLoaded', function() {
+            checkAuth();
+            
+            document.getElementById('postForm').addEventListener('submit', handleSubmit);
+        });
+
+        async function checkAuth() {
+            try {
+                const response = await fetch('/api/auth.php?action=me');
+                const result = await response.json();
+                
+                if (result.success) {
+                    currentUser = result.data.user;
+                    
+                    // Check if user can create posts
+                    if (currentUser.role !== 'seller' || currentUser.status !== 'approved') {
+                        showAlert('danger', 'Solo los vendedores aprobados pueden crear publicaciones.');
+                        setTimeout(() => {
+                            window.location.href = '/feed';
+                        }, 2000);
+                    }
+                } else {
+                    window.location.href = '/login';
+                }
+            } catch (error) {
+                window.location.href = '/login';
+            }
+        }
+
+        function previewImages() {
+            const input = document.getElementById('images');
+            const preview = document.getElementById('image-preview');
+            selectedImages = Array.from(input.files);
+            
+            preview.innerHTML = '';
+            
+            if (selectedImages.length > 10) {
+                showAlert('warning', 'Máximo 10 imágenes permitidas. Se seleccionarán las primeras 10.');
+                selectedImages = selectedImages.slice(0, 10);
+            }
+            
+            selectedImages.forEach((file, index) => {
+                const reader = new FileReader();
+                reader.onload = function(e) {
+                    const col = document.createElement('div');
+                    col.className = 'col-md-3 mb-3';
+                    col.innerHTML = `
+                        <div class="card">
+                            <img src="${e.target.result}" class="card-img-top" style="height: 150px; object-fit: cover;">
+                            <div class="card-body p-2">
+                                <small class="text-muted">${file.name}</small>
+                                ${index === 0 ? '<div class="badge bg-primary">Principal</div>' : ''}
+                                <button type="button" class="btn btn-sm btn-outline-danger float-end" 
+                                        onclick="removeImage(${index})">×</button>
+                            </div>
+                        </div>
+                    `;
+                    preview.appendChild(col);
+                };
+                reader.readAsDataURL(file);
+            });
+        }
+
+        function removeImage(index) {
+            selectedImages.splice(index, 1);
+            
+            // Update file input
+            const dt = new DataTransfer();
+            selectedImages.forEach(file => dt.items.add(file));
+            document.getElementById('images').files = dt.files;
+            
+            previewImages();
+        }
+
+        async function handleSubmit(e) {
+            e.preventDefault();
+            
+            const btn = document.getElementById('submitBtn');
+            const spinner = btn.querySelector('.spinner-border');
+            const alertContainer = document.getElementById('alert-container');
+            
+            // Show loading state
+            btn.disabled = true;
+            spinner.classList.remove('d-none');
+            alertContainer.innerHTML = '';
+            
+            try {
+                // First, create the post
+                const formData = new FormData(this);
+                const postData = {
+                    title: formData.get('title'),
+                    description: formData.get('description'),
+                    price: parseFloat(formData.get('price')),
+                    property_type: formData.get('property_type'),
+                    bedrooms: formData.get('bedrooms') || null,
+                    bathrooms: formData.get('bathrooms') || null,
+                    area_sqm: formData.get('area_sqm') || null,
+                    address: formData.get('address') || null,
+                    city: formData.get('city') || null,
+                    state: formData.get('state') || null,
+                    country: formData.get('country') || null,
+                    latitude: formData.get('latitude') || null,
+                    longitude: formData.get('longitude') || null
+                };
+                
+                const postResponse = await fetch('/api/posts.php', {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json'
+                    },
+                    body: JSON.stringify(postData)
+                });
+                
+                const postResult = await postResponse.json();
+                
+                if (!postResult.success) {
+                    throw new Error(postResult.message);
+                }
+                
+                const postId = postResult.data.post_id;
+                
+                // Upload images if any
+                if (selectedImages.length > 0) {
+                    showAlert('info', 'Publicación creada. Subiendo imágenes...');
+                    
+                    for (let i = 0; i < selectedImages.length; i++) {
+                        const imageFormData = new FormData();
+                        imageFormData.append('image', selectedImages[i]);
+                        imageFormData.append('post_id', postId);
+                        imageFormData.append('is_primary', i === 0 ? '1' : '0');
+                        
+                        const imageResponse = await fetch('/api/uploads.php', {
+                            method: 'POST',
+                            body: imageFormData
+                        });
+                        
+                        const imageResult = await imageResponse.json();
+                        if (!imageResult.success) {
+                            console.warn(`Error uploading image ${i + 1}:`, imageResult.message);
+                        }
+                    }
+                }
+                
+                showAlert('success', 'Propiedad publicada exitosamente. Redirigiendo...');
+                setTimeout(() => {
+                    window.location.href = '/feed';
+                }, 2000);
+                
+            } catch (error) {
+                showAlert('danger', error.message || 'Error al crear la publicación');
+            } finally {
+                btn.disabled = false;
+                spinner.classList.add('d-none');
+            }
+        }
+
+        function showAlert(type, message) {
+            const alertContainer = document.getElementById('alert-container');
+            alertContainer.innerHTML = `
+                <div class="alert alert-${type} alert-dismissible fade show" role="alert">
+                    ${message}
+                    <button type="button" class="btn-close" data-bs-dismiss="alert"></button>
+                </div>
+            `;
+            
+            // Scroll to top to show alert
+            window.scrollTo({ top: 0, behavior: 'smooth' });
+        }
+
+        async function logout() {
+            try {
+                await fetch('/api/auth.php?action=logout', { method: 'POST' });
+                window.location.href = '/login';
+            } catch (error) {
+                window.location.href = '/login';
+            }
+        }
+    </script>
+</body>
+</html>
